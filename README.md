@@ -1,16 +1,6 @@
-[![Stargazers][stars-shield]][https://github.com/unlikelyzero/js-perf-toolkit/stargazers]
-[![Issues][issues-shield]][https://github.com/unlikelyzero/js-perf-toolkit/issues]
-[![MIT License][license-shield]][https://github.com/unlikelyzero/js-perf-toolkit/blob/main/LICENSE]
-[![LinkedIn][linkedin-shield]][https://www.linkedin.com/in/linkedjohnhill/]
-
-
-
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/unlikelyzero/js-perf-toolkit">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
   <h3 align="center">js-perf-toolkit</h3>
 
