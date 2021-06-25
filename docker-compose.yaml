@@ -1,0 +1,157 @@
+version: '3'
+
+services:
+  your-app:
+    image: << image here >>
+    container_name: your-app
+    restart: always
+    ports:
+      - 9000:9000
+    expose: 
+      - 9000
+    networks:
+      - monitoring
+      - k6
+
+  k6:
+    image: loadimpact/k6:latest
+    ports:
+      - "6565:6565"
+    environment:
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    volumes:
+      - ./scripts:/scripts
+    networks:
+      - k6  
+      
+  browserless:
+    image: browserless/chrome:latest
+    container_name: browserless
+    restart: always
+    environment:
+      - DEBUG=browserless:*
+      - MAX_CONCURRENT_SESSIONS=10
+      - CONNECTION_TIMEOUT=60000
+      - PREBOOT_CHROME=true
+    ports:
+      - 3003:3000
+    expose: 
+      - 3003
+    networks:
+      - monitoring
+
+  influxdb:
+    image: influxdb:latest
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6   
+    networks:
+      - k6
+      - monitoring     
+
+  mon_prometheus:
+    image: prom/prometheus:latest
+    container_name: mon_prometheus
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    expose:
+      - 9090
+    ports:
+      - 9090:9090  
+    depends_on:
+      - mon_node-exporter
+      - mon_cadvisor
+      - mon_loki
+      - mon_promtail
+    networks:
+      - monitoring
+
+  mon_node-exporter:
+    image: prom/node-exporter:latest
+    container_name: mon_node-exporter
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.ignored-mount-points="^(/rootfs|/host|)/(sys|proc|dev|host|etc)($$|/)"'
+      - '--collector.filesystem.ignored-fs-types="^(sys|proc|auto|cgroup|devpts|ns|au|fuse\.lxc|mqueue)(fs|)$$"'
+    networks:
+      - monitoring
+
+  mon_cadvisor:
+    image: google/cadvisor:latest
+    container_name: mon_cadvisor
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitoring
+
+  mon_grafana:
+    image: grafana/grafana:latest
+    container_name: mon_grafana
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - grafana:/var/lib/grafana
+    ports:
+      - 127.0.0.1:3000:3000
+    user: "1000"
+    depends_on:
+      - mon_prometheus
+    networks:
+      - monitoring
+
+  mon_loki:
+    image: grafana/loki:latest
+    container_name: mon_loki
+    ports:
+      - 127.0.0.1:3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki/config.yaml:/etc/loki/config.yaml
+      - loki:/data/loki
+    networks:
+      - monitoring
+
+  mon_promtail:
+    image: grafana/promtail:latest
+    container_name: mon_promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./promtail:/etc/promtail-config/
+    command: -config.file=/etc/promtail-config/promtail.yml
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+  k6:
+
+volumes:
+  grafana:
+  loki:
+  prometheus:
+  influxdb:
