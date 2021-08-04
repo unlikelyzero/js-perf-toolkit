@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@playwright/test": "1.13.1",
+    "playwright": "^1.13.1"
+  },
+  "scripts": {
+    "test:e2e": "npx playwright test"
+  }
+}

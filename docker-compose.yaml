@@ -1,20 +1,23 @@
 version: '3'
 
 services:
-  your-app:
-    image: << image here >>
-    container_name: your-app
-    restart: always
-    ports:
-      - 9000:9000
-    expose: 
-      - 9000
-    networks:
-      - monitoring
-      - k6
+  #image: unlikelyzero/performance-observer:latest
+  #build:
+  #  context: ../performance-observer
+  #  dockerfile: performance.Dockerfile
+  #container_name: performance-observer
+  #restart: always
+  #ports:
+  #  - 6789:6789
+  #expose: 
+  #  - 9000
+  #networks:
+  #  - monitoring
+  #  - k6
 
   k6:
     image: loadimpact/k6:latest
+    container_name: k6
     ports:
       - "6565:6565"
     environment:
@@ -27,10 +30,11 @@ services:
   browserless:
     image: browserless/chrome:latest
     container_name: browserless
+    cpu_count: 2
     restart: always
     environment:
       - DEBUG=browserless:*
-      - MAX_CONCURRENT_SESSIONS=10
+      - MAX_CONCURRENT_SESSIONS=1
       - CONNECTION_TIMEOUT=60000
       - PREBOOT_CHROME=true
     ports:
@@ -41,7 +45,8 @@ services:
       - monitoring
 
   influxdb:
-    image: influxdb:latest
+    image: influxdb:1.8
+    container_name: influxdb
     ports:
       - "8086:8086"
     environment:
@@ -68,8 +73,8 @@ services:
     depends_on:
       - mon_node-exporter
       - mon_cadvisor
-      - mon_loki
-      - mon_promtail
+      #- mon_loki
+      #- mon_promtail
     networks:
       - monitoring
 
@@ -123,28 +128,28 @@ services:
     networks:
       - monitoring
 
-  mon_loki:
-    image: grafana/loki:latest
-    container_name: mon_loki
-    ports:
-      - 127.0.0.1:3100:3100
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - ./loki/config.yaml:/etc/loki/config.yaml
-      - loki:/data/loki
-    networks:
-      - monitoring
+  #mon_loki:
+  #  image: grafana/loki:latest
+  #  container_name: mon_loki
+  #  ports:
+  #    - 127.0.0.1:3100:3100
+  #  command: -config.file=/etc/loki/local-config.yaml
+  #  volumes:
+  #    - ./loki/config.yaml:/etc/loki/config.yaml
+  #    - loki:/data/loki
+  #  networks:
+  #    - monitoring
 
-  mon_promtail:
-    image: grafana/promtail:latest
-    container_name: mon_promtail
-    volumes:
-      - /var/log:/var/log
-      - /var/lib/docker/containers:/var/lib/docker/containers
-      - ./promtail:/etc/promtail-config/
-    command: -config.file=/etc/promtail-config/promtail.yml
-    networks:
-      - monitoring
+  #mon_promtail:
+  #  image: grafana/promtail:latest
+  #  container_name: mon_promtail
+  #  volumes:
+  #    - /var/log:/var/log
+  #    - /var/lib/docker/containers:/var/lib/docker/containers
+  #    - ./promtail:/etc/promtail-config/
+  #  command: -config.file=/etc/promtail-config/promtail.yml
+  #  networks:
+  #    - monitoring
 
 networks:
   monitoring:
@@ -152,6 +157,6 @@ networks:
 
 volumes:
   grafana:
-  loki:
+  #loki:
   prometheus:
   influxdb:
