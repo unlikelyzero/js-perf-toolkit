@@ -21,21 +21,21 @@ test.describe('feature foo', () => {
     console.log( performanceMetrics.metrics );
 
     //await browser.startTracing(page,{path:`trace.json`,screenshots:true, categories: ['devtools.timeline']});
-    await browser.startTracing(page, {path: './test-results/trace.json'});
+    await browser.startTracing(page, {path: './test-results/trace.json', screenshots: true});
 
-    //Get startHeadSnapShot
-    console.log('Gathering start.heapsnapshot')
-    await fetch(heapDumpUrl)
-    .then(res => res.text())
-    .then(data => {
-        fs.writeFile(startHeapSnapShot, data, err => {
-            if (err) {
-                console.error(err)
-                return;
-            }
-            console.log('Success: saved file', startHeapSnapShot);
-        });
-    });
+    // //Get startHeadSnapShot
+    // console.log('Gathering start.heapsnapshot')
+    // await fetch(heapDumpUrl)
+    // .then(res => res.text())
+    // .then(data => {
+    //     fs.writeFile(startHeapSnapShot, data, err => {
+    //         if (err) {
+    //             console.error(err)
+    //             return;
+    //         }
+    //         console.log('Success: saved file', startHeapSnapShot);
+    //     });
+    // });
 
     //Baseline page measurement of HTML
     await console.time('htmlfloor');
@@ -53,31 +53,42 @@ test.describe('feature foo', () => {
     await page.locator('.visible').isVisible();
     await console.timeLog('htmlfloor');
 
-    await browser.stopTracing();
-
     await console.time('cold:plotenabled');
     await console.time('cold:load');
     await console.time('cold:idle');
 
-    //Get end Heapsnapshot
-    console.log('Gathering end.heapsnapshot')
-    await fetch(heapDumpUrl)
-    .then(res => res.text())
-    .then(data => {
-        fs.writeFile(endHeapSnapShot, data, err => {
-            if (err) {
-                console.error(err)
-                return;
-            }
-            console.log('Success: saved file', endHeapSnapShot);
-        });
-    }), { timeout: 120000 };
+    // //Get end Heapsnapshot
+    // console.log('Gathering end.heapsnapshot')
+    // await fetch(heapDumpUrl)
+    // .then(res => res.text())
+    // .then(data => {
+    //     fs.writeFile(endHeapSnapShot, data, err => {
+    //         if (err) {
+    //             console.error(err)
+    //             return;
+    //         }
+    //         console.log('Success: saved file', endHeapSnapShot);
+    //     });
+    // }), { timeout: 120000 };
 
     await page.goto('/');
+
+    await page.addScriptTag({type: 'module', url: 'https://unpkg.com/@sumup/performance-observer@1.0.2/dist/performance-observer.es5.min.js?module'})
+    await page.waitForFunction(() => window.PerformanceObserverEntryList);
+    
+    //Example of setting arbitrary mark on performance timeline
+    // await page.evaluate(() => (window.performance.mark("perf:start")));
+
     await page.waitForLoadState('load');
     await console.timeLog('cold:load');
     await page.waitForLoadState('networkidle');
     await console.timeLog('cold:idle');
+
+      // Executes Navigation API within the page cont
+    await page.evaluate(() => JSON.stringify(window.performance.mark("perf:start")));
+
+    // await page.evaluate(function() {window.performance.mark("perf:start")});
+
 
     //Reloading to simulate "Warm Cache"
     await console.time('reload:plotenabled');
@@ -89,6 +100,11 @@ test.describe('feature foo', () => {
     await console.timeLog('reload:load');
     await page.waitForLoadState('networkidle');
     await console.timeLog('reload:idle');
+
+    await page.evaluate(() => (window.performance.mark("perf:reloaded")));
+
+    await browser.stopTracing();
+
 
     const resourceTimingJson = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType('resource')));
 
@@ -103,15 +119,15 @@ test.describe('feature foo', () => {
   
     console.log('window timing', performanceTiming);
 
-    //Long Task API Attempt
-    const longTaskTimingJson = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType('longtask')));
+    // //FIX Long Task API Attempt
+    // const longTaskTimingJson = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType('longtask')));
 
-    const longTaskTiming = JSON.parse(longTaskTimingJson);
-    console.log('longtask timing',longTaskTiming);
+    // const longTaskTiming = JSON.parse(longTaskTimingJson);
+    // console.log('longtask timing',longTaskTiming);
 
-    //Long Task API Attempt 2
-    const results = await page.evaluate(function() {return window.longtasks});
-	  await console.log(results);
+    // //FIX Long Task API Attempt 2
+    // const results = await page.evaluate(function() {return window.longtasks});
+	  // await console.log(results);
 
 
   });
