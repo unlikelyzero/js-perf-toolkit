@@ -104,3 +104,7 @@ dist
 .tern-port
 grafana/grafana.db
 k6/scripts/copied-har.js
+
+playwright/test-results
+playwright/start.heapsnapshot
+.DS_Store

@@ -57,8 +57,6 @@ A collection of (Open Source) performance tools which allow a js developer to re
 * [k6](https://github.com/k6io/k6)
 * [browserless](https://github.com/browserless/chrome)
 * [grafana](https://github.com/grafana/grafana)
-* [loki](https://github.com/grafana/loki)
-* [promtail](https://github.com/afiskon/promtail-client)
 * [prometheus](https://github.com/prometheus/prometheus)
 * [influxdb](https://github.com/influxdata/influxdb)
 
@@ -81,11 +79,24 @@ This is an example of how to list things you need to use the software and how to
    git clone https://github.com/unlikelyzero/js-perf-toolkit.git
    ```
 2. Add your webapp to compose file and expose port 9000
-3. Start the containers
+3. Start the monitoring containers (except browserless)
    ```
-   docker compose up
+   docker compose up -d
    ```
-4. WIP   
+4. Verify that the following webservers are up:
+   ```
+   localhost:9090
+   localhost:8086
+   localhost:8089
+   localhost:3006
+   ```
+5. Start the browserless container
+   ```
+   docker compose -f ./browserless.dc.yaml up -d browserless
+6. Verify that the following webserver is up
+   ```
+   localhost:3003
+   ```
 <!-- USAGE EXAMPLES -->
 ## Usage
 

@@ -1,0 +1,31 @@
+version: '2'
+services:
+  browserless:
+    image: browserless/chrome:latest
+    container_name: browserless
+    cpus: 2.0
+    mem_limit: 4g
+    environment:
+      - MAX_CONCURRENT_SESSIONS=1
+      - CONNECTION_TIMEOUT=60000
+      - PREBOOT_CHROME=true
+      - DEFAULT_HEADLESS=false
+      - ENABLE_DEBUGGER=true
+      - DEFAULT_IGNORE_HTTPS_ERRORS=true
+      - ENABLE_API_GET=true
+      - DEFAULT_LAUNCH_ARGS=["--window-size=1200,900"]
+      - ENABLE_HEAP_DUMP=true
+    volumes:
+      - browserless:/tmp/
+    ports:
+      - "3003:3000"
+    expose:
+      - 3003
+      - 3000
+    networks:
+      - js-perf-toolkit_monitoring
+networks:
+  js-perf-toolkit_monitoring:
+    external: true
+volumes:
+  browserless: {}

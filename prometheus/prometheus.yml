@@ -3,19 +3,16 @@ global:
   evaluation_interval: 15s
 rule_files:
 scrape_configs:
-  - job_name: 'node-exporter'
+  - job_name: 'prometheus'
     static_configs:
-      - targets: [ 'mon_node-exporter:9100' ]
-
+      - targets: [ 'localhost:9090' ]
   - job_name: 'cadvisor'
     static_configs:
       - targets: [ 'mon_cadvisor:8080' ]
-
-  - job_name: 'caddy'
-    static_configs:
-      - targets: [ 'mon_caddy:3210' ]
-
+    metrics_path: '/metrics'
   - job_name: 'browserless'
     static_configs:
-    - targets: [ 'host.docker.internal:3003' ]    
+      - targets: [ 'browserless:3000' ]
     metrics_path: '/prometheus'
+    scrape_interval: 1s
+

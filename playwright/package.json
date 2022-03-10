@@ -1,9 +1,13 @@
 {
-  "dependencies": {
-    "@playwright/test": "1.13.1",
-    "playwright": "^1.13.1"
+  "devDependencies": {
+    "@playwright/test": "1.18.1",
+    "playwright": "1.18.1",
+    "node-fetch": "^2.6.7"
   },
   "scripts": {
-    "test:e2e": "npx playwright test"
+    "test:local:demo": "npx playwright test --project=local-chrome demo",
+    "test:local:example": "npx playwright test--project=local-chrome example",
+    "test:browserless:demo": "npx playwright test --project=browserless demo",
+    "test:browserless:example": "npx playwright test --project=browserless example"
   }
 }
