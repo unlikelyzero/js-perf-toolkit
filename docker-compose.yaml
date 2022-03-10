@@ -14,11 +14,10 @@ services:
     expose:
       - 8086
     networks:
-      - monitoring    
-
+      - monitoring
   mon_prometheus_write:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: mon_prometheus
     command: --enable-feature=remote-write-receiver --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -58,7 +57,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
       - /:/rootfs:ro
-      - /var/run:/var/run:ro
+      #- /var/run:/var/run:ro # linux
+      - /var/run/docker.sock:/var/run/docker.sock:rw # Docker for Mac
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
@@ -86,11 +86,32 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
      ports:
-       - 3006:3000
+       - "3006:3000"
      expose:
        - 3006
        - 3000
      networks:
+      - monitoring
+
+  mon_toxiproxy:
+    image: "ghcr.io/shopify/toxiproxy"
+    container_name: mon_toxiproxy
+    command: 
+      -runtime-metrics
+      -proxy-metrics
+    ports:
+       - "8474:8474"
+       - "8088:8080"
+       - "3306:3306"
+       - "6379:6379"
+       - "16379:16379"
+    expose:
+       - 8088
+       - 8474
+       - 16379
+       - 3306
+       - 6379
+    networks:
       - monitoring
 
 networks:

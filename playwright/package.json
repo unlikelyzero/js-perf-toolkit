@@ -5,9 +5,9 @@
     "node-fetch": "^2.6.7"
   },
   "scripts": {
-    "test:local:demo": "npx playwright test --project=local-chrome demo",
-    "test:local:example": "npx playwright test--project=local-chrome example",
-    "test:browserless:demo": "npx playwright test --project=browserless demo",
-    "test:browserless:example": "npx playwright test --project=browserless example"
+    "test:local:capabilities": "npx playwright test --project=local-chrome capabilities",
+    "test:local:variability": "npx playwright test --project=local-chrome variability --repeat-each=5",
+    "test:browserless:capabilities": "npx playwright test --project=browserless capabilities",
+    "test:browserless:variability": "npx playwright test --project=browserless variability --repeat-each=5"
   }
 }

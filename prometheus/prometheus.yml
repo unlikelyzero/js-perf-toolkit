@@ -15,4 +15,8 @@ scrape_configs:
       - targets: [ 'browserless:3000' ]
     metrics_path: '/prometheus'
     scrape_interval: 1s
+  - job_name: 'toxiproxy'
+    static_configs:
+      - targets: [ 'mon_toxiproxy:8474' ]
+    metrics_path: '/metrics'
 
