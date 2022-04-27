@@ -30,7 +30,7 @@ variability:example: 780.326ms
 variability:example: 584.115ms
 
 */
-test.skip('basic test', async ({ page, browser }) => {
+test('basic test', async ({ page, browser }) => {
   await console.time('variability:example');
   await page.goto('https://playwright.dev/');
   const title = page.locator('.navbar__inner .navbar__title');
@@ -38,7 +38,7 @@ test.skip('basic test', async ({ page, browser }) => {
   await console.timeLog('variability:example');
 });
 
-test.skip('basic test - with network shaping', async ({ page, browser }) => {
+test('basic test - with network shaping', async ({ page, browser }) => {
   // This uses the DevToolsProtocol to do traffic shaping from the perspective of Chrome to the target URL. 
   // Note: this does NOT affect WS traffic and has issues with http 1.1/2.0/3.0 compatibility
   const client = await page.context().newCDPSession(page);
@@ -55,7 +55,7 @@ test.skip('basic test - with network shaping', async ({ page, browser }) => {
   await console.timeLog('variability:example');
 });
 
-test.only('basic test - with CPU Modification', async ({ page, browser }) => {
+test.skip('basic test - with CPU Modification', async ({ page, browser }) => {
   // This uses the DevToolsProtocol to throttle CPU Utilization
   const client = await page.context().newCDPSession(page);
   await client.send('Emulation.setCPUThrottlingRate', { rate: 4 });
