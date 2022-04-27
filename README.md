@@ -54,13 +54,12 @@ A collection of (Open Source) performance tools which allow a js developer to re
 
 ### Built With
 
+* [playwright](https://github.com/microsoft/playwright)
 * [k6](https://github.com/k6io/k6)
 * [browserless](https://github.com/browserless/chrome)
 * [grafana](https://github.com/grafana/grafana)
 * [prometheus](https://github.com/prometheus/prometheus)
 * [influxdb](https://github.com/influxdata/influxdb)
-
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -100,7 +99,13 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-WIP
+This can be used to verify basic playwright functionality
+
+```
+cd playwright
+npm install
+npm run test:local:basic
+```
 
 
 <!-- ROADMAP -->
