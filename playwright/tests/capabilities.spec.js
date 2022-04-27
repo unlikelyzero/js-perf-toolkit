@@ -96,7 +96,7 @@ test.describe('Demo Capabilities', () => {
 
   });
 
-  test.only('Route Image Replacement', async ({ page, browser, context }) => { 
+  test('Route Image Replacement', async ({ page, browser, context }) => { 
     await context.addInitScript(() => delete window.navigator.serviceWorker);
 
     // URL to replace

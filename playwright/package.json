@@ -1,14 +1,14 @@
 {
   "devDependencies": {
     "@playwright/test": "1.18.1",
-    "playwright": "1.18.1",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "playwright": "^1.18.1"
   },
   "scripts": {
     "test:local:basic": "npx playwright test --project=local-chrome basic",
     "test:local:capabilities": "npx playwright test --project=local-chrome capabilities",
     "test:local:variability": "npx playwright test --project=local-chrome zeroed --repeat-each=50",
     "test:browserless:capabilities": "npx playwright test --project=browserless capabilities",
-    "test:browserless:variability": "npx playwright test --project=browserless variability --repeat-each=5"
+    "test:browserless:variability": "npx playwright test --project=browserless zeroed --repeat-each=5"
   }
 }
