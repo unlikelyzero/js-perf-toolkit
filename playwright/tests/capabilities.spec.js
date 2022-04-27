@@ -1,13 +1,12 @@
 const { test, browser } = require('./fixtures');
 const { expect } = require('@playwright/test');
 
-const fetch = require('node-fetch');
 const fs = require('fs');
+const path = require('path');
 
-const heapDumpUrl = 'http://localhost:3003/heapdump'
 
-const startHeapSnapShot = './start.heapsnapshot'
-const endHeapSnapShot = './end.heapsnapshot'
+const localImagePath = path.join(__dirname, "./assets/style.css");
+
 
 test.describe('Demo Capabilities', () => {
   test('Access the running devtools and request CDP Performance metrics', async ({ page, browser }) => {
@@ -36,7 +35,7 @@ test.describe('Demo Capabilities', () => {
 
   });
 
-  test.only('Capture Trace during test execution and demonstrate marks', async ({ page, browser }) => { 
+  test('Capture Trace during test execution and demonstrate marks', async ({ page, browser }) => { 
 
     console.log("\n==== Devtools: startTracing ====\n");
     await browser.startTracing(page, {path: './trace.json', screenshots: true});
@@ -97,9 +96,29 @@ test.describe('Demo Capabilities', () => {
 
   });
 
-  test('API Manipulation', async ({ page, browser, context }) => { 
+  test.only('Route Image Replacement', async ({ page, browser, context }) => { 
     await context.addInitScript(() => delete window.navigator.serviceWorker);
 
+    // URL to replace
+    const remoteFilePath = 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png';
+    // Local (override) file to use instead
+    const localFilePath = path.join(__dirname, "./bingLogo.png");
+
+    await page.route('https://www.google.com/images/branding/googlelogo/2x/*.png', (route) => {
+
+      const url = route.request().url();
+      console.log(`Intercepted ${url}`);
+
+      if (url === remoteFilePath && !url.match(localFilePath)) {
+        route.fulfill({
+          body: fs.readFileSync(
+            localFilePath
+          )
+        });
+      } else {
+        route.continue();
+      }
+    })
     // Go to https://www.google.com/    
     await page.goto('https://www.google.com/');
 
@@ -108,18 +127,13 @@ test.describe('Demo Capabilities', () => {
     // Fill [aria-label="Search"]
     await page.fill('[aria-label="Search"]', 'playwright');
 
-    await page.route('**/search**', route => route.fulfill(
-      {
-        body: 'Not found!'
-      })
-    );
-
     // Press Enter
     await Promise.all([
       page.waitForNavigation(),
       page.press('[aria-label="Search"]', 'Enter')
     ]);
-    await page.pause();
+
+    await page.screenshot();
   });
 
 });
