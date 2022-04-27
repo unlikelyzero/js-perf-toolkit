@@ -175,7 +175,7 @@ test.describe('Demo Capabilities', () => {
     // await page.waitForFunction(() => window.PerformanceObserverEntryList);
     
     //Example of setting arbitrary mark on performance timeline
-    await page.evaluate(() => (window.performance.mark("perf:start")));
+    await page.evaluate(() => JSON.stringify(window.performance.mark("perf:start")));
 
     await page.waitForLoadState('load');
     await console.timeLog('cold:load');
@@ -218,6 +218,11 @@ test.describe('Demo Capabilities', () => {
     const performanceTiming = JSON.parse(performanceTimingJson);
   
     console.log('performance.window.timing', performanceTiming);
+
+    const longTaskTimingJson = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType('longtask')));
+
+    const longTaskTiming = JSON.parse(longTaskTimingJson);
+    console.log('longtask timing',longTaskTiming);
 
     console.log("\n==== [UNDER CONSTRUCTION] Gather all longTask events ====\n");
     // //FIX Long Task API Attempt
