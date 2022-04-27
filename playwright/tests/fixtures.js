@@ -2,7 +2,7 @@ const base = require('@playwright/test');
 
 exports.test = base.test.extend({
   browser: async ({ playwright, browser }, use, workerInfo) => {
-    // Use browserless if configured
+    // Use browserless if configured from the playwright.config project
     // Currently using .connectOverCDP()
     if (workerInfo.project.name.match(/browserless/)) {
       const vBrowser = await playwright.chromium.connectOverCDP({
