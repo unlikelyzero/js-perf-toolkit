@@ -36,7 +36,7 @@ const config = {
       name: "local-chrome",
         use: {
             browserName: 'chromium',
-            channel: 'chrome-beta'
+            channel: 'chrome'
         },
     }
   ]
