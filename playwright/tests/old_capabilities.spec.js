@@ -10,8 +10,7 @@ const startHeapSnapShot = './start.heapsnapshot'
 const endHeapSnapShot = './end.heapsnapshot'
 
 test.describe('Demo Capabilities', () => {
-  test('Access the running devtools and request CDP Performance metrics', async ({ page, browser }) => {
-    
+  test.skip('Access the running devtools and request CDP Performance metrics', async ({ page, browser }) => {
     // Create a new connection to an existing CDPSession to enable Performance Measurements
     const client = await page.context().newCDPSession(page);
     // Tell the DevTools session to record performance metrics
@@ -36,87 +35,29 @@ test.describe('Demo Capabilities', () => {
 
   });
 
-  test.only('Capture Trace during test execution and demonstrate marks', async ({ page, browser }) => { 
-
-    console.log("\n==== Devtools: startTracing ====\n");
-    await browser.startTracing(page, {path: './trace.json', screenshots: true});
-
-    // Go to https://www.google.com/    
-    await page.goto('https://www.google.com/');
-
-    //Use performance.mark API
+  test('Capture Trace during test execution and demonstrate marks', async ({ page, browser }) => {
+    // Create a new connection to an existing CDPSession to enable Performance Measurements
+    const client = await page.context().newCDPSession(page);    
     await page.evaluate(() => (window.performance.mark("perf:start")));
 
+    // Go to https://www.google.com/    
+    await page.goto('https://www.google.com/');
     // Click [aria-label="Search"]
     await page.click('[aria-label="Search"]');
     // Fill [aria-label="Search"]
     await page.fill('[aria-label="Search"]', 'playwright');
+    // Press Enter
+    await Promise.all([
+      page.waitForNavigation(),
+      page.press('[aria-label="Search"]', 'Enter')
+    ]);
 
-    //Performance.mark API
     await page.evaluate(() => (window.performance.mark("perf:stop")));
 
+    console.log("\n==== Devtools: Performance.getMetrics ====\n");
+    let performanceMetrics = await client.send('Performance.getMetrics');
+    console.log( performanceMetrics.metrics );
 
-    // console.log("\n==== performance.measure our marks! ====\n");
-    await page.evaluate(() => (window.performance.measure("overall","perf:start","perf:stop")));
-
-    // Press Enter
-    await Promise.all([
-      page.waitForNavigation(),
-      page.press('[aria-label="Search"]', 'Enter')
-    ]);
-
-
-    console.log("\n==== Devtools: stopTracing ====\n");
-    await browser.stopTracing();
-
-  });
-
-  test('Add DevTools Network Delay', async ({ page, browser }) => { 
-    const client = await page.target().createCDPSession();
-    await client.send('Network.enable')
-    await client.send('Network.emulateNetworkConditions', {
-      latency: 500
-    })
-
-    // Go to https://www.google.com/    
-    await page.goto('https://www.google.com/');
-
-    // Click [aria-label="Search"]
-    await page.click('[aria-label="Search"]');
-    // Fill [aria-label="Search"]
-    await page.fill('[aria-label="Search"]', 'playwright');
-
-    // Press Enter
-    await Promise.all([
-      page.waitForNavigation(),
-      page.press('[aria-label="Search"]', 'Enter')
-    ]);
-
-  });
-
-  test('API Manipulation', async ({ page, browser, context }) => { 
-    await context.addInitScript(() => delete window.navigator.serviceWorker);
-
-    // Go to https://www.google.com/    
-    await page.goto('https://www.google.com/');
-
-    // Click [aria-label="Search"]
-    await page.click('[aria-label="Search"]');
-    // Fill [aria-label="Search"]
-    await page.fill('[aria-label="Search"]', 'playwright');
-
-    await page.route('**/search**', route => route.fulfill(
-      {
-        body: 'Not found!'
-      })
-    );
-
-    // Press Enter
-    await Promise.all([
-      page.waitForNavigation(),
-      page.press('[aria-label="Search"]', 'Enter')
-    ]);
-    await page.pause();
   });
 
 
@@ -132,6 +73,9 @@ test.describe('Demo Capabilities', () => {
     let performanceMetrics = await client.send('Performance.getMetrics');
     console.log( performanceMetrics.metrics );
 
+    console.log("\n==== Devtools: startTracing ====\n");
+    //await browser.startTracing(page,{path:`trace.json`,screenshots:true, categories: ['devtools.timeline']});
+    await browser.startTracing(page, {path: './trace.json', screenshots: true});
 
 
     console.log("\n==== Browserless: gather heapsnapshot ====\n");
@@ -150,7 +94,29 @@ test.describe('Demo Capabilities', () => {
     });
 
 
-  
+    console.log("\n==== Best Practice: Define your floor for test transferability ====\n");
+    //Baseline page measurement of HTML
+    await console.time('htmlfloor');
+    //Create simple HTML to inject and test agains
+    await page.setContent(`
+    <div class="visible">Hello world</div>
+    <div style="display:none" class="hidden"></div>
+    <div class="editable" editable>Edit me</div>
+    <input type="checkbox" enabled class="enabled">
+    <input type="checkbox" disabled class="disabled">
+    <input type="checkbox" checked class="checked">
+    <input type="checkbox" class="unchecked">
+    `);
+
+    await page.pause();
+
+    await page.locator('.visible').isVisible();
+    await console.timeLog('htmlfloor');
+
+    await console.time('cold:load');
+    await console.time('cold:idle');
+
+
     
 
     console.log("\n==== Browserless: gather heapsnapshot2 ====\n");
