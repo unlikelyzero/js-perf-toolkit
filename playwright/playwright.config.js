@@ -16,8 +16,7 @@ const config = {
     screenshot: 'on',
     trace: 'on',
     baseURL: 'https://playwright.dev/',
-    ignoreHTTPSErrors: true,
-    
+    ignoreHTTPSErrors: true
   },
   workers: 1,
   projects: [
@@ -37,7 +36,8 @@ const config = {
       name: "local-chrome",
         use: {
             browserName: 'chromium',
-            channel: 'chrome'
+            channel: 'chrome',
+            contextOptions: { recordHar: { path: './har.har'}}
         },
     }
   ]
