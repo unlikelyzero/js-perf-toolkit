@@ -15,3 +15,18 @@ function addObserver() {
 };
 
 addObserver();
+
+/*
+  test.only('LongTasks and PerformanceObserver', async ({page, browser}) => {
+    // const client = await page.context().newCDPSession(page);
+    // await client.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await page.addInitScript({
+      path: './perf/tests/pw/addObserver.js'
+    });
+    await page.goto(website);
+    await page.waitForTimeout(1000 * 5);
+    const longtasks = await page.evaluate(() => window.longtasks);
+    console.log(longtasks);
+
+  });
+*/
