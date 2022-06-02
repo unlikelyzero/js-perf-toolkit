@@ -35,7 +35,7 @@ test.describe('Demo Capabilities', () => {
 
   });
 
-  test('Capture Trace during test execution and demonstrate marks', async ({ page, browser }) => { 
+  test('Capture Performance Timeline Trace during test execution and demonstrate marks', async ({ page, browser }) => { 
 
     console.log("\n==== Devtools: startTracing ====\n");
     await browser.startTracing(page, {path: './trace.json', screenshots: true});
@@ -61,6 +61,11 @@ test.describe('Demo Capabilities', () => {
     const getAllMarksJson = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType("mark")));
     const getAllMarks = JSON.parse(getAllMarksJson);
     console.log('window.performance.getEntriesByType("mark")', getAllMarks);
+
+       //Get All Performance Marks Including Google's
+       const getAllMeasuresJson = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType("measure")));
+       const getAllMeasures = JSON.parse(getAllMeasuresJson);
+       console.log('window.performance.getEntriesByType("measure")', getAllMeasures);
 
     // Press Enter
     await Promise.all([
@@ -98,6 +103,11 @@ test.describe('Demo Capabilities', () => {
 
   test('Route Image Replacement', async ({ page, browser, context }) => { 
     await context.addInitScript(() => delete window.navigator.serviceWorker);
+
+    const client = await page.context().newCDPSession(page);
+    // Tell the DevTools session to record performance metrics
+    // https://chromedevtools.github.io/devtools-protocol/tot/Performance/#method-getMetrics
+    await client.send('Overlay.setShowFPSCounter', { show: true }); 
 
     // URL to replace
     const remoteFilePath = 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png';

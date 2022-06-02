@@ -17,6 +17,7 @@ const config = {
     trace: 'on',
     baseURL: 'https://playwright.dev/',
     ignoreHTTPSErrors: true,
+    
   },
   workers: 1,
   projects: [
