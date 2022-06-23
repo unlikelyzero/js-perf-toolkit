@@ -50,7 +50,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-A collection of (Open Source) performance tools which allow a js developer to reliably model and monitor a webapp. 
+A collection of (Open Source) performance tools which allow a js developer to reliably model and monitor a webapp. At the moment, most of the focus is on the playwright component. 
 
 ### Built With
 
@@ -70,43 +70,57 @@ To get a local copy up and running follow these simple steps.
 
 This is an example of how to list things you need to use the software and how to install them.
 * [Docker](https://docs.docker.com/get-docker/)
+* [nodejs](https://github.com/nvm-sh/nvm/)
 
 ### Installation
 
+This installation is split into two components: the playwright local installation and the full stack of performance Infrastructure.
+
+#### playwright local
+1. Clone this repo 
+   ```sh
+   git clone https://github.com/unlikelyzero/js-perf-toolkit.git
+   ```
+2. Install nvm. https://github.com/nvm-sh/nvm/
+3. npm install the `./playwright` repo
+   ```sh
+   cd playwright
+   nvm use 14
+   npm install
+   ```
+4. install playwright browsers
+   ```sh
+   npx playwright install
+   ```
+4. run a basic test
+   ```sh
+   npm run test:local:basic
+   ```
+
+#### Docker Infrastructure
 1. Clone the repo
    ```sh
    git clone https://github.com/unlikelyzero/js-perf-toolkit.git
    ```
-2. Add your webapp to compose file and expose port 9000
-3. Start the monitoring containers (except browserless)
+1. Start the monitoring containers (except browserless)
    ```
    docker compose up -d
    ```
-4. Verify that the following webservers are up:
+1. Verify that the following webservers are up:
    ```
    localhost:9090
    localhost:8086
    localhost:8089
    localhost:3006
    ```
-5. Start the browserless container
+1. Start the browserless container
    ```
    docker compose -f ./browserless.dc.yaml up -d browserless
-6. Verify that the following webserver is up
+1. Verify that the following webserver is up
    ```
    localhost:3003
    ```
 <!-- USAGE EXAMPLES -->
-## Usage
-
-This can be used to verify basic playwright functionality
-
-```
-cd playwright
-npm install
-npm run test:local:basic
-```
-
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -117,8 +131,6 @@ See the [open issues](https://github.com/unlikelyzero/js-perf-toolkit/issues) fo
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-
 
 <!-- CONTACT -->
 ## Contact
